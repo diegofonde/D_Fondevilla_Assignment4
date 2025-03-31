@@ -1,19 +1,29 @@
-#imports
+# imports
 from helper import helper
 from db_operations import db_operations
 
-#global variables
+
+# global variables
 db_ops = db_operations("playlist.db")
 
-#functions
+# functions
 def startScreen():
-    print("Welcome to your playlist!")
-    # db_ops.create_songs_table()
-    db_ops.populate_songs_table("songs.csv")
+    print("Welcome to you playlist!")
 
-#show user menu options
+    #db_ops.create_songs_table()
+
+    # prompt user if they want to load new songs to the database
+    choice = input("Do you want to load new songs into the database? (yes/no): ")
+    if choice == "yes":
+        filepath =  input("Enter the path to the file containing new songs: ")
+        db_ops.update_songs_table(filepath)
+
+    if db_ops.is_songs_empty():
+        db_ops.populate_songs_table("songs.csv")
+
+# print menu and have users select option
 def options():
-    print('''Select from the following menu options: 
+    print('''Select from the following menu options:
     1. Find songs by artist
     2. Find songs by genre
     3. Find songs by feature
@@ -22,9 +32,9 @@ def options():
     6. Exit''')
     return helper.get_choice([1,2,3,4,5,6])
 
-#search for songs by artist
+# print all artists, let users select one, and then display all songs by that artist
 def search_by_artist():
-    #get list of all artists in table
+    # get all artists
     query = '''
     SELECT DISTINCT Artist
     FROM songs;
@@ -32,91 +42,89 @@ def search_by_artist():
     print("Artists in playlist: ")
     artists = db_ops.single_attribute(query)
 
-    #show all artists, create dictionary of options, and let user choose
+    # display all artists and let the user pick one
     choices = {}
     for i in range(len(artists)):
-        print(i, artists[i])
         choices[i] = artists[i]
+        print(i, artists[i])
     index = helper.get_choice(choices.keys())
 
-    #user can ask to see 1, 5, or all songs
+    # user can ask for 1, 5, or all songs returned
     print("How many songs do you want returned for", choices[index]+"?")
     print("Enter 1, 5, or 0 for all songs")
     num = helper.get_choice([1,5,0])
 
-    #print results
-    query = '''SELECT DISTINCT name
+    # display all songs by that artist
+    query = '''
+    SELECT DISTINCT name
     FROM songs
-    WHERE Artist =:artist ORDER BY RANDOM()
+    WHERE Artist =:artist
+    ORDER BY RANDOM()
     '''
     dictionary = {"artist":choices[index]}
     if num != 0:
-        query +="LIMIT:lim"
+        query += "LIMIT:lim"
         dictionary["lim"] = num
     results = db_ops.single_attribute_params(query, dictionary)
     helper.pretty_print(results)
 
-#search songs by genre
 def search_by_genre():
-    #get list of genres
+    # get all genre
     query = '''
     SELECT DISTINCT Genre
     FROM songs;
     '''
-    print("Genres in playlist:")
+    print("Genres in playlist: ")
     genres = db_ops.single_attribute(query)
 
-    #show genres in table and create dictionary
+    # display all genres2 and let the user pick one
     choices = {}
     for i in range(len(genres)):
-        print(i, genres[i])
         choices[i] = genres[i]
+        print(i, genres[i])
     index = helper.get_choice(choices.keys())
 
-    #user can ask to see 1, 5, or all songs
+    # user can ask for 1, 5, or all songs returned
     print("How many songs do you want returned for", choices[index]+"?")
     print("Enter 1, 5, or 0 for all songs")
     num = helper.get_choice([1,5,0])
 
-    #print results
-    query = '''SELECT DISTINCT name
+    # display all songs by that genre
+    query = '''
+    SELECT DISTINCT name
     FROM songs
-    WHERE Genre =:genre ORDER BY RANDOM()
+    WHERE Genre =:genre
+    ORDER BY RANDOM()
     '''
     dictionary = {"genre":choices[index]}
     if num != 0:
-        query +="LIMIT:lim"
+        query += "LIMIT:lim"
         dictionary["lim"] = num
     results = db_ops.single_attribute_params(query, dictionary)
     helper.pretty_print(results)
 
-#search songs table by features
 def search_by_feature():
-    #features we want to search by
+    # features to sort by
     features = ['Danceability', 'Liveness', 'Loudness']
-    choices = {}
 
-    #show features in table and create dictionary
+    # show features and have user select one
     choices = {}
     for i in range(len(features)):
-        print(i, features[i])
         choices[i] = features[i]
+        print(i, features[i])
     index = helper.get_choice(choices.keys())
 
-    #user can ask to see 1, 5, or all songs
+    # user can ask for 1, 5, or all songs returned
     print("How many songs do you want returned for", choices[index]+"?")
     print("Enter 1, 5, or 0 for all songs")
     num = helper.get_choice([1,5,0])
 
-    #what order does the user want this returned in?
-    print("Do you want results sorted in asc or desc order?")
-    order = input("ASC or DESC: ")
+    # print results
+    query = "SELECT DISTINCT name FROM songs ORDER BY "+choices[index]+" DESC "
 
-    #print results
-    query = "SELECT DISTINCT name FROM songs ORDER BY "+choices[index]+" "+order
     dictionary = {}
     if num != 0:
-        query +=" LIMIT:lim"
+        query += "LIMIT:lim"
         dictionary["lim"] = num
     results = db_ops.single_attribute_params(query, dictionary)
     helper.pretty_print(results)
@@ -135,14 +143,12 @@ def update_song_info():
     # If there is no results
     if len(songs_searched_results) == 0:
         print("There is no existing song in the database\n")
+        return
     else:
-
         # Let user alter the attribute they desire
         print("Select what you want to alter: ")
-
         attributes = ['Name', 'Album', 'Artist', 'releaseDate', 'Explicit']
         choices = {}
-
         for i in range(len(attributes)):
             print(i, attributes[i])
             choices[i] = attributes[i]
@@ -171,9 +177,7 @@ def update_song_info():
                     else: 
                         print("Invalid value, please type in a date.")
                         new = input("Input the new value: ")    
-                
             else:  
-
                 if new == "True" or new == "False":
                     if new == "True":
                         new == True
@@ -193,10 +197,8 @@ def update_song_info():
         WHERE songID =:songid
         '''
 
-        new_info = {"value":new,"songid":songs_searched_results[0]}
+        new_info = {"value":new,"songid":songs_searched_results[0][0]}
         db_ops.modify_query_params(query,new_info)
-            
-           
 
 def delete_song():
     song_name = input("What is the name of the song you want to delete?: ")
@@ -210,19 +212,19 @@ def delete_song():
 
     if len(songs_searched_results) == 0:
         print("There is no existing song in the database.")
+        return
     else:
         query = '''
         DELETE FROM songs
         WHERE songID =:songid
         '''
 
-        song_to_delete = {"songid": songs_searched_results[0]}
+        song_to_delete = {"songid": songs_searched_results[0][0]}
         db_ops.modify_query_params(query, song_to_delete)
 
-#main method
-startScreen()
 
-#program loop
+# main method
+startScreen()
 while True:
     user_choice = options()
     if user_choice == 1:
@@ -238,5 +240,4 @@ while True:
     if user_choice == 6:
         print("Goodbye!")
         break
-
 db_ops.destructor()
