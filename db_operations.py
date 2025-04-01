@@ -123,15 +123,12 @@ class db_operations():
     # function to update songs table given some path
     # to a CSV containing new records
     def update_songs_table(self, filepath):
-      try:
-          data = helper.data_cleaner(filepath)
-          attribute_count = len(data[0])
-          placeholders = ("?," * attribute_count)[:-1]
-          query = "INSERT INTO songs VALUES (" + placeholders + ")"
-          self.bulk_insert(query, data)
-          print("New songs were added!")
-      except FileNotFoundError:
-          print("File path not found. Invalid.")
+        data = helper.data_cleaner(filepath)
+        attribute_count = len(data[0])
+        placeholders = ("?," * attribute_count)[:-1]
+        query = "INSERT INTO songs VALUES (" + placeholders + ")"
+        self.bulk_insert(query, data)
+        print("New songs were added!")
 
     # destructor that closes connection with DB
     def destructor(self):
