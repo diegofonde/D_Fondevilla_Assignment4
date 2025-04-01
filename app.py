@@ -12,14 +12,23 @@ def startScreen():
 
     #db_ops.create_songs_table()
 
-    # prompt user if they want to load new songs to the database
-    choice = input("Do you want to load new songs into the database? (yes/no): ")
-    if choice == "yes":
-        filepath =  input("Enter the path to the file containing new songs: ")
-        db_ops.update_songs_table(filepath)
+    while True:
+        # prompt user if they want to load new songs to the database
+        choice = input("Do you want to load new songs into the database? (yes/no): ")
+        # exit loop if no
+        if choice == "no":
+            break
+        # if yes
+        while True:
+            filepath = input("Enter the path to the file containing new songs: ")
+            try:
+                db_ops.update_songs_table(filepath)
+                break
+            except FileNotFoundError:
+                print("File path not found. Try again.")
 
-    if db_ops.is_songs_empty():
-        db_ops.populate_songs_table("songs.csv")
+        if db_ops.is_songs_empty():
+            db_ops.populate_songs_table("songs.csv")
 
 # print menu and have users select option
 def options():
