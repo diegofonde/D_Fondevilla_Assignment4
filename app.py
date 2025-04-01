@@ -198,7 +198,7 @@ def update_song_info():
         WHERE songID =:songid
         '''
 
-        new_info = {"value":new,"songid":songs_searched_results[0][0]}
+        new_info = {"value":new,"songid":songs_searched_results[0]}
         db_ops.modify_query_params(query,new_info)
         print("Song was successfully updated!")
 
@@ -221,7 +221,7 @@ def delete_song():
         WHERE songID =:songid
         '''
 
-        song_to_delete = {"songid": songs_searched_results[0][0]}
+        song_to_delete = {"songid": songs_searched_results[0]}
         db_ops.modify_query_params(query, song_to_delete)
         print("Song was successfully deleted!")
 
