@@ -4,10 +4,11 @@ App program for Database Management Class
 ## Identifying Information
 
 * Name: Diego Fondevilla, Lindsey Lee
-* Student ID: 2429115, 
+* Student ID: 2429115, 2431422
 * Email: fondevilla@chapman.edu, lindlee@chapman.edu
 * Course: CPSC-408-1
 * Assignment: Assignment 4
+* Completed Bonus 3
 
 ## Source Files
 
@@ -16,6 +17,7 @@ App program for Database Management Class
 * helper.py
 * playlist.db
 * songs.csv
+* songs_update.csv
 
 ## References
 
