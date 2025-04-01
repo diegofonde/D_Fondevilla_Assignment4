@@ -29,8 +29,9 @@ def options():
     3. Find songs by feature
     4. Update song information
     5. Delete song
-    6. Exit''')
-    return helper.get_choice([1,2,3,4,5,6])
+    6. Remove songs with NULL values
+    7. Exit''')
+    return helper.get_choice([1,2,3,4,5,6,7])
 
 # print all artists, let users select one, and then display all songs by that artist
 def search_by_artist():
@@ -199,6 +200,7 @@ def update_song_info():
 
         new_info = {"value":new,"songid":songs_searched_results[0][0]}
         db_ops.modify_query_params(query,new_info)
+        print("Song was successfully updated!")
 
 def delete_song():
     song_name = input("What is the name of the song you want to delete?: ")
@@ -221,6 +223,21 @@ def delete_song():
 
         song_to_delete = {"songid": songs_searched_results[0][0]}
         db_ops.modify_query_params(query, song_to_delete)
+        print("Song was successfully deleted!")
+
+# BONUS 3: function to remove all records with at least 1 NULL value
+def delete_null_songs():
+    query = '''
+    DELETE FROM songs
+    WHERE Name IS NULL
+        OR Album IS NULL
+        OR Artist IS NULL
+        OR releaseDate IS NULL
+        OR Explicit IS NULL;
+    '''
+
+    db_ops.modify_query(query)
+    print("All songs with at least one NULL value were removed!")
 
 
 # main method
@@ -238,6 +255,8 @@ while True:
     if user_choice == 5:
         delete_song()
     if user_choice == 6:
+        delete_null_songs()
+    if user_choice == 7:
         print("Goodbye!")
         break
 db_ops.destructor()
