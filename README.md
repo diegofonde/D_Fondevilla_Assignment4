@@ -29,5 +29,4 @@ App program for Database Management Class
 
 ## Execution Instructions
 
-* g++ *.cpp -o MP
-* ./MP input-spec.txt log2.txt
+* python3 app.py
