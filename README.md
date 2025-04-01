@@ -23,7 +23,7 @@ App program for Database Management Class
 
 ## Known Errors
 
-* none
+* Errors will occur if providing a file path to a .csv file with already existing songs when prompted. Will work with original file with no updates made yet.
 
 ## Execution Instructions
 
